@@ -1,0 +1,20 @@
+$blue: #1877F2;
+$green: #42B72A;
+$paragraph-margin-bottom: 0;
+$gray-600: rgb(245,245,245);
+$border-radius: 0;
+@import "~bootstrap/scss/bootstrap";
+
+body {
+    background-size: cover;
+    min-height: 100vh;
+    background: linear-gradient(203deg, 
+    rgba(131, 58, 180, 0.9) 0%, 
+    rgba(253, 29, 29, 0.9) 50%,
+    rgba(252, 176, 69, 0.9) 100%
+);
+}
+
+.user-div:hover{
+    background-color: rgb(250,250,250);
+}
