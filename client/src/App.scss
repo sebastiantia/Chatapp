@@ -1,20 +1,44 @@
-$blue: #1877F2;
-$green: #42B72A;
+$blue: #1877f2;
+$green: #42b72a;
 $paragraph-margin-bottom: 0;
-$gray-600: rgb(245,245,245);
+$gray-600: rgb(245, 245, 245);
 $border-radius: 0;
 @import "~bootstrap/scss/bootstrap";
 
 body {
-    background-size: cover;
-    min-height: 100vh;
-    background: linear-gradient(203deg, 
-    rgba(131, 58, 180, 0.9) 0%, 
-    rgba(253, 29, 29, 0.9) 50%,
-    rgba(252, 176, 69, 0.9) 100%
-);
+  background-size: cover;
+  min-height: 100vh;
+  background: dimgray;
+  font-family: 'Courier New', Courier, monospace;
 }
 
-.user-div:hover{
-    background-color: rgb(250,250,250);
+.user-div:hover {
+  background-color: rgb(250, 250, 250);
+}
+
+.messages-box {
+  height: 500px;
+  overflow-y: scroll;
+
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.user-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.message-input::placeholder{
+    color: rgba(0,0,0,0.5);
+}
+
+.info-text {
+    color: rgba(0,0,0,0.5);
+    text-align: center;
+    margin-bottom: 1rem;
 }

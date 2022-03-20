@@ -123,11 +123,12 @@ export const Register = (props : any) => {
               type="submit"
               className="text-center"
               disabled={loading}
+              style={{"backgroundColor":"#8D6E63", "borderColor":"#8D6E63" , "color":"white"}}
             >
               {loading ? "loading..." : "Register"}
             </Button>
             <br/>
-            <small>Already have an account? <Link to="/login">Login</Link></small>
+            <small>Already have an account? <Link to="/login" style={{"color":"#8D6E63"}} >Login</Link></small>
 
           </div>
         </Form>

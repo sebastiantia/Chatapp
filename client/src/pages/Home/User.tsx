@@ -29,6 +29,7 @@ export const User = () => {
   const { users } = useMessageState()
   const selectedUser = users?.find((u : any) => u.selected === true)?.username
 
+
   const { loading } = useQuery(GET_USERS, {
     onCompleted: (data) =>
       dispatch({ type: 'SET_USERS', payload: data.getUsers }),
@@ -46,19 +47,18 @@ export const User = () => {
       return (
         <div
           role="button"
-          className={classNames("user-div d-flex p-3", { 'bg-white': selected})}
+          className={classNames("user-div d-flex justify-content-center justify-content-md-start p-3", { 'bg-white': selected})}
           key={user.username}
-          onClick={() =>
+          onClick={() => 
             dispatch({ type: 'SET_SELECTED_USER', payload: user.username })
           }
         >
           <Image
-            src={user.imageUrl}
-            roundedCircle
-            style={{ width: 50, height: 50, objectFit: 'cover' }}
+            src={user.imageUrl || "https://static01.nyt.com/images/2019/02/05/world/05egg/15xp-egg-promo-superJumbo-v2.jpg"}
+            className="user-image"
           />
-          <div style={{"marginLeft":"5px"}}>
-            <p className="text-success">{user.username}</p>
+          <div style={{"marginLeft":"5px"}} className="d-none d-md-block ml-2">
+            <p style={{"fontWeight":"bold"}}>{user.username}</p>
             <p className="font-weight-light">
               {user.latestMessage
                 ? user.latestMessage.content
@@ -70,7 +70,7 @@ export const User = () => {
     })
   }
   return (
-    <Col xs={4} className="p-0 bg-secondary">
+    <Col xs={2} md={4} className="p-0 bg-secondary">
       {usersMarkup}
     </Col>
   )

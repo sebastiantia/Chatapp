@@ -97,11 +97,13 @@ export const Login = (props : any) => {
                   className="text-center"
                   onClick={submitLoginForm}
                   disabled={loading}
+                  style={{"backgroundColor":"#8D6E63", "borderColor":"#8D6E63" , "color":"white"}}
+
                 >
                   {loading ? "loading..." : "Login"}
                 </Button>
                 <br/>
-                <small>Don't have an account? <Link to="/register">Register</Link></small>
+                <small>Don't have an account? <Link to="/register" style={{"color":"#8D6E63"}}> Register</Link></small>
               </div>
             </Form>
           </Col>

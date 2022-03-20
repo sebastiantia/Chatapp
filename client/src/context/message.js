@@ -1,56 +1,73 @@
-import React, { createContext, useReducer, useContext } from "react";
+import React, { createContext, useReducer, useContext } from 'react'
 
-export const MessageStateContext = createContext();
-export const MessageDispatchContext = createContext();
+const MessageStateContext = createContext()
+const MessageDispatchContext = createContext()
 
 const messageReducer = (state, action) => {
-  let usersCopy;
+  let usersCopy, userIndex
+  const { username, message, messages } = action.payload
   switch (action.type) {
-    case "SET_USERS":
+    case 'SET_USERS':
       return {
         ...state,
         users: action.payload,
-      };
-    case "SET_USER_MESSAGES":
-      const { username, messages } = action.payload;
-      usersCopy = [...state.users];
-      const userIndex = usersCopy.findIndex((u) => u.username === username);
-      usersCopy[userIndex] = { ...usersCopy[userIndex], messages };
+      }
+    case 'SET_USER_MESSAGES':
+      usersCopy = [...state.users]
+
+      userIndex = usersCopy.findIndex((u) => u.username === username)
+
+      usersCopy[userIndex] = { ...usersCopy[userIndex], messages }
+
       return {
         ...state,
         users: usersCopy,
-      };
-
-    case "SET_SELECTED_USER":
+      }
+    case 'SET_SELECTED_USER':
       usersCopy = state.users.map((user) => ({
         ...user,
         selected: user.username === action.payload,
-        //iterating through users and marking whichever '.username' is equal to the payload (which is the selected user)
-      }));
+      }))
 
       return {
         ...state,
         users: usersCopy,
-      };
+      }
+    case 'ADD_MESSAGE':
+      usersCopy = [...state.users]
 
+      userIndex = usersCopy.findIndex((u) => u.username === username)
+
+      let newUser = {
+        ...usersCopy[userIndex],
+        messages: usersCopy[userIndex].messages
+          ? [message, ...usersCopy[userIndex].messages]
+          : null,
+        latestMessage: message,
+      }
+
+      usersCopy[userIndex] = newUser
+
+      return {
+        ...state,
+        users: usersCopy,
+      }
     default:
-      throw new Error(`Unknown action type: ${action.type}`);
+      throw new Error(`Unknown action type: ${action.type}`)
   }
-};
+}
 
 export const MessageProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(messageReducer, { users: null });
+  const [state, dispatch] = useReducer(messageReducer, { users: null })
 
   return (
-    <>
-      <MessageDispatchContext.Provider value={dispatch}>
-        <MessageStateContext.Provider value={state}>
-          {children}
-        </MessageStateContext.Provider>
-      </MessageDispatchContext.Provider>
-    </>
-  );
-};
+    <MessageDispatchContext.Provider value={dispatch}>
+      <MessageStateContext.Provider value={state}>
+        {children}
+      </MessageStateContext.Provider>
+    </MessageDispatchContext.Provider>
+  )
+}
 
-export const useMessageState = () => useContext(MessageStateContext);
-export const useMessageDispatch = () => useContext(MessageDispatchContext);
+export const useMessageState = () => useContext(MessageStateContext)
+export const useMessageDispatch = () => useContext(MessageDispatchContext)

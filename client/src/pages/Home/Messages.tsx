@@ -1,8 +1,21 @@
-import React, { Fragment, useEffect } from "react";
-import { gql, useLazyQuery } from "@apollo/client";
-import { Col } from "react-bootstrap";
+import React, { Fragment, useEffect, useState } from "react";
+import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { Col, Form } from "react-bootstrap";
 
 import { useMessageDispatch, useMessageState } from "../../context/message";
+import { Message } from "./Message";
+
+const SEND_MESSAGE = gql`
+  mutation SendMessages($to: String!, $content: String!) {
+    sendMessage(to: $to, content: $content) {
+      uuid
+      from
+      to
+      content
+      createdAt
+    }
+  }
+`;
 
 const GET_MESSAGES = gql`
   query getMessages($from: String!) {
@@ -22,6 +35,26 @@ export const Messages = () => {
 
   const selectedUser = users?.find((u: any) => u.selected === true);
   const messages = selectedUser?.messages;
+  const [content, setContent] = useState("");
+
+  const submitMessage = (e: any) => {
+    e.preventDefault();
+    if (content.trim() === "" || !selectedUser) return 
+    setContent(' ')
+    sendMessages({ variables: { to: selectedUser.username, content } });
+  };
+
+  const [sendMessages] = useMutation(SEND_MESSAGE, {
+    onCompleted: (data) =>
+      dispatch({
+        type: "ADD_MESSAGE",
+        payload: {
+          username: selectedUser.username,
+          message: data.sendMessage,
+        },
+      }),
+    onError: (err) => console.log(err),
+  });
 
   const [getMessages, { loading: messagesLoading, data: messagesData }] =
     useLazyQuery(GET_MESSAGES);
@@ -43,27 +76,50 @@ export const Messages = () => {
       });
     }
   }, [messagesData]);
-  
+
   //conditional rendering for messages Markup
   let selectedChatMarkup;
   if (!messages && !messagesLoading) {
-    selectedChatMarkup = <p>Select a friend</p>;
+    selectedChatMarkup = <p className="info-text">Select a friend</p>;
   } else if (messagesLoading) {
-    selectedChatMarkup = <p>Loading..</p>;
+    selectedChatMarkup = <p className="info-text">Loading..</p>;
   } else if (messages.length > 0) {
-    selectedChatMarkup = messages.map(
-      (message: any, index: number) => (
-        <p key={message.uuid}> {message.content}</p>
-      )
-    );
-
+    selectedChatMarkup = messages.map((message: any, index: number) => (
+      <Fragment>
+        <Message key={message.uuid} message={message} />
+        {index === message.length - 1 && (
+          <div className="invisible">
+            <hr className="m-0" />
+          </div>
+        )}
+      </Fragment>
+    ));
   } else if (messages.length === 0) {
-    selectedChatMarkup = <p>You are now connected! send your first message!</p>;
+    selectedChatMarkup = <p className="info-text">You are now connected! send your first message!</p>;
   }
 
   return (
-    <Col xs={10} md={8} className="messages-box d-flex flex-column-reverse">
-      {selectedChatMarkup}
+    <Col xs={10} md={8}>
+      <div className="messages-box d-flex flex-column-reverse ">
+        {selectedChatMarkup}
+      </div>
+      <div>
+      <Form onSubmit={submitMessage}>
+        <Form.Group className="d-flex align-items-center">
+          <Form.Control
+            type="text"
+            className="message-input rounded-pill p-2 mb-2 border-0"
+            placeholder="Type a message..."
+            value={content}
+            style={{ "background": "#FFE0B2" }}
+            onChange={(e) => setContent(e.target.value)}
+          />
+          <button onClick={submitMessage} style={{"all":"unset", "cursor":"pointer"}}>
+          <img src="/icons8-airplane-91.png"  style={{ "marginLeft":"0.5em","width":"2rem", "height":"2rem", "objectFit":"cover" }} />
+          </button>
+        </Form.Group>
+      </Form>
+      </div>
     </Col>
   );
 };

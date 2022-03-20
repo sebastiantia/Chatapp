@@ -1,6 +1,11 @@
 const { User, Message } = require("../../models");
 const { UserInputError, AuthenticationError } = require("apollo-server");
-const { Op } = require("sequelize")
+const { Op } = require("sequelize");
+const { PubSub } = require('graphql-subscriptions');
+const { subscribe } = require("graphql");
+
+const pubsub = new PubSub();
+
 module.exports = {
   Query: {
     getMessages: async (parent, { from }, { user }) => {
@@ -11,18 +16,17 @@ module.exports = {
 
         if (!otherUser) throw new UserInputError("User not found");
 
-        const usernames = [user.username, otherUser.username]
+        const usernames = [user.username, otherUser.username];
 
         const messages = await Message.findAll({
-            where: {
-                from: { [Op.in]: usernames},
-                to: { [Op.in] : usernames}
-            },
-            order: [['createdAt', 'DESC']],
-        })
+          where: {
+            from: { [Op.in]: usernames },
+            to: { [Op.in]: usernames },
+          },
+          order: [["createdAt", "DESC"]],
+        });
 
-        return messages 
-
+        return messages;
       } catch (e) {
         console.log(e);
         throw e;
@@ -52,10 +56,17 @@ module.exports = {
           to,
           content,
         });
+
+        pubsub.publish('NEW_MESSAGE', { newMessage: message})
+
         return message;
       } catch (e) {
         console.log(e);
       }
     },
+  },
+  Subscription: {
+    newMessage: {
+      subscribe: async (_, __) => pubsub.asyncIterator(["NEW_MESSAGE"])}
   },
 };
